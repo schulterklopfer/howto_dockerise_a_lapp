@@ -1,0 +1,26 @@
+version: '3.4'
+services:
+  bitcoin:
+    image: bitcoind:latest
+    restart: always
+    ports:
+      - 8333:8333
+    volumes:
+      - /your/home/directory/docker/volumes/bitcoin/bitcoin:/bitcoin/.bitcoin
+  lnd:
+    image: lnd:0.4-beta
+    restart: always
+    ports:
+      - 9735:9735
+      - 10009:10009
+    volumes:
+      - /your/home/directory/docker/volumes/bitcoin/lnd:/root/.lnd
+  lviz:
+    image: lapp:latest
+    restart: always
+    ports:
+      - 80:80
+    volumes:
+      - /your/home/directory/docker/volumes/bitcoin/lnd:/root/.lnd
+    environment:
+      LND_HOST: lnd
