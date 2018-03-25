@@ -4,7 +4,7 @@
 
 ## Prerequisits
 
-* disk space of at least 200G for docker images and blockchain data
+* free disk space of at least 200G for docker images and blockchain data
 * user with sudo privileges
 * docker
 * coffee :)
