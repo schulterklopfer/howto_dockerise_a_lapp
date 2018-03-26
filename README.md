@@ -141,7 +141,7 @@ services:
     volumes:
       # mount the volume containing bitcoin.conf and the blockchain data 
       # on the host to /bitcoin/.bitcoin in the container
-      - /your/home/directory/docker/volumes/bitcoin/bitcoind:/bitcoin/.bitcoin
+      - /your/directory/docker/volumes/bitcoin/bitcoind:/bitcoin/.bitcoin
   lnd:
     image: lnd:0.4-beta
     # always restart after container died
@@ -159,7 +159,7 @@ services:
     volumes:
       # mount the volume containing lnd.conf and lnd data 
       # on the host to /root/.lnd in the container
-      - /your/home/directory/docker/volumes/bitcoin/lnd:/root/.lnd
+      - /your/directory/docker/volumes/bitcoin/lnd:/root/.lnd
   # Your lightning enabled app goes here
   lapp:
     image: lapp:latest
@@ -170,7 +170,7 @@ services:
     volumes:
       # mount the volume containing lnd.conf and lnd data 
       # on the host to /root/.lnd in the container
-      - /your/home/directory/docker/volumes/bitcoin/lnd:/root/.lnd
+      - /your/directory/docker/volumes/bitcoin/lnd:/root/.lnd
     environment:
       # set an environment variable to tell the container on which 
       # host lnd runs on
