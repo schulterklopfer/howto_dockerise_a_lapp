@@ -1,5 +1,7 @@
 # How to dockerise a lightning app on ubuntu 16.04
 
+## Intended setup
+
 ![LAPP docker stack](https://github.com/schulterklopfer/howto_dockerise_a_lapp/raw/master/lapp_stack.png "LAPP docker stack")
 
 ## Prerequisits
