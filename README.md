@@ -97,6 +97,15 @@ Dockerfile
 node_modules
 package-lock.json
 ```
+To build your image containing your lightning enabled application you simply have to run
+the following command from the directory the `Dockerfile` is located:
+
+`docker build . -t lapp:latest`
+
+This will execute the steps from `Dockerfile` and tag the resulting image with `lapp:latest`.
+You can use whatever tag you like, for example `awesome_app:v0.1-alpha` as long as it matches the tag in the configuration file
+for your stack deployment. This topic will be covered later.
+
 Now we have everything we need to configure and run our bitcoin stack containing your
 lightning app.
 
