@@ -204,3 +204,15 @@ docker stack logs -f lapp_bitcoin
 docker stack logs -f lapp_lnd
 docker stack logs -f lapp_lapp
 ```
+
+----
+
+Do you like this small guide?
+Then [send me an email](howto_lapp@skp.rocks) or maybe even some love to:
+`3DEs5ZVP38z1nxMhveiPhHkbeuhnfhiJ6R`
+
+Also checkout my [sonification of the bitcoin blockchain](http://radio.skp.rocks/blockchain/)
+
+Thanks for reading. :-D
+
+*CapitanRetardo*
