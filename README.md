@@ -65,31 +65,8 @@ If you use `lapp_base:latest` as your base image, you will have access to `lncli
 your application container at runtime later. 
 If you don't need that, you can use whichever base image you like.
 
-`lapp_base:latest` is based on [golang:1.10](https://hub.docker.com/_/golang/) which is base on a ubuntu linux distribution.
+`lapp_base:latest` is based on `lnd:0.4-beta` which is based on [`golang:1.10`](https://hub.docker.com/_/golang/) which is base on an ubuntu linux distribution.
 
-
-A Dockerfile for a simple nodejs lightning app would look something like this:
-
-```
-FROM lapp_base:latest
-
-RUN apt-get update && apt-get install -y python-software-properties curl
-RUN curl -sL https://deb.nodesource.com/setup_8.x | bash -
-RUN apt-get update && apt-get install -y nodejs
-
-RUN mkdir -p /opt/local/app
-WORKDIR /opt/local/app
-
-ADD ./ .
-
-RUN npm i
-
-CMD lncli --rpcserver lnd:10009 getinfo && npm start
-```
-
-
-Now we have everything we need to configure and run our bitcoin stack containing your
-lightning app.
 
 A Dockerfile for a simple nodejs lightning app would look something like this:
 
@@ -118,3 +95,6 @@ Dockerfile
 node_modules
 package-lock.json
 ```
+Now we have everything we need to configure and run our bitcoin stack containing your
+lightning app.
+
