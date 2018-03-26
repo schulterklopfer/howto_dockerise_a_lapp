@@ -16,14 +16,18 @@
 To install docker on your machine, please follow [this guide](https://www.digitalocean.com/community/tutorials/how-to-install-and-use-docker-on-ubuntu-16-04). Make sure you don't forget
 to add your user to the docker group using by using this command:
  
- `sudo usermod -aG docker ${USER}` 
+```bash
+sudo usermod -aG docker ${USER}
+``` 
 
 ## 2. Create a docker swarm
 This guide relies on docker stacks. To use docker stacks we need to put your docker daemon
 into swarm mode. Swarm mode is very useful to distribute this setup across several physical hosts.
 The following command will do this:
 
-`docker swarm init`
+```bash
+docker swarm init
+```
 
 find out more about this command [here](https://docs.docker.com/engine/reference/commandline/swarm_init/).
 
@@ -38,7 +42,7 @@ You will find all the required files to build the images needed for the stack in
 You will also find a base image for your lightning app and an example of how to use it.
 To build and register the needed images with docker do the following:
 
-```
+```bash
 git clone https://github.com/schulterklopfer/howto_dockerise_a_lapp.git 
 cd howto_dockerise_a_lapp
 cd template/images
@@ -46,6 +50,18 @@ cd template/images
 ```
 
 This will call `docker build` in the respective folder and tag the resulting images accordingly.
+
+```bash
+#!/bin/bash
+
+# will always build a container with the latest release of bitcoind
+docker build bitcoind -t bitcoind:latest && \
+# will build lnd 0.4 beta and cherry pick some commits to support communication over docker containers
+docker build lnd -t lnd:0.4-beta && \
+# will build a base image containing the lncli command
+docker build lapp_base -t lapp_base:latest 
+```
+
 * bitcoind will have the tag 'bitcoind:latest'
 * lnd will have the tag 'lnd:0.4-beta'
 * lapp_base will have the tag 'lapp_base:latest'
@@ -73,7 +89,7 @@ If you don't need that, you can use whichever base image you like.
 A Dockerfile for creating an image which would run the awesome nodejs lightning network explorer
 from [https://graph.lndexplorer.com/](https://graph.lndexplorer.com/) would look something like this:
 
-```
+```dockerfile
 FROM lapp_base:latest
 
 RUN apt-get update && apt-get install -y python-software-properties curl git
@@ -128,7 +144,7 @@ For our case, we need to run three containers.
 
 The configuration file for this would look like this:
 
-```
+```yaml
 version: '3.4'
 services:
   bitcoin:
@@ -181,25 +197,25 @@ services:
 If we built all the images without error and we have tagged the images correctly, we should be able to
 startup the stack like this:
 
-```
+```bash
 docker stack deploy -c lapp.yaml lapp
 ```
 
 To stop the stack again use:
 
-```
+```bash
 docker stack rm lapp
 ```
 
 To list all services type:
 
-```
+```bash
 docker stack list
 ```
 
 To display the output of a certain service use:
 
-```
+```bash
 docker stack logs -f lapp_bitcoin
 docker stack logs -f lapp_lnd
 docker stack logs -f lapp_lapp
