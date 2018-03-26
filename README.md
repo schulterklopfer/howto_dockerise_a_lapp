@@ -27,7 +27,7 @@ The following command will do this:
 
 find out more about this command [here](https://docs.docker.com/engine/reference/commandline/swarm_init/).
 
-## 3. Create your lightning app stack
+## 3. Create your docker images
 Your lightning app stack will contain three docker services
 
 1) bitcoind
@@ -100,3 +100,4 @@ package-lock.json
 Now we have everything we need to configure and run our bitcoin stack containing your
 lightning app.
 
+## 4. Run your lightning app stack
