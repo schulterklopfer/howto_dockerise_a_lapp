@@ -70,21 +70,25 @@ If you don't need that, you can use whichever base image you like.
 `lapp_base:latest` is based on `lnd:0.4-beta` which is based on [`golang:1.10`](https://hub.docker.com/_/golang/) which is base on an ubuntu linux distribution.
 
 
-A Dockerfile for a simple nodejs lightning app would look something like this:
+A Dockerfile for creating an image which would run the awesome nodejs lightning network explorer
+from [https://graph.lndexplorer.com/](https://graph.lndexplorer.com/) would look something like this:
 
 ```
 FROM lapp_base:latest
 
-RUN apt-get update && apt-get install -y python-software-properties curl
+RUN apt-get update && apt-get install -y python-software-properties curl git
 RUN curl -sL https://deb.nodesource.com/setup_8.x | bash -
 RUN apt-get update && apt-get install -y nodejs
 
-RUN mkdir -p /opt/local/app
-WORKDIR /opt/local/app
+RUN mkdir -p /opt/app
 
-ADD ./ .
+WORKDIR /opt/app
+RUN git clone https://github.com/altangent/lightning-viz.git src
+
+WORKDIR /opt/app/src/
 
 RUN npm i
+RUN npm run build
 
 CMD lncli --rpcserver lnd:10009 getinfo && npm start
 ```
