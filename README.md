@@ -114,3 +114,93 @@ Now we have everything we need to configure and run our bitcoin stack containing
 lightning app.
 
 ## 4. Run your lightning app stack
+
+To tell docker what containers we want to run from which image, we will need to write a configuration
+file containing all the information to run a container. This information includes for example services
+we want to start, volumes to mount into the docker container, ports to make accessible to the host and such.
+
+Typically those files are in `yaml` format.
+
+For our case, we need to run three containers. 
+* One using the bitcoind:latest image
+* One using the lnd:0.4-beta image
+* One using your application, in this case lapp:latest
+
+The configuration file for this would look like this:
+
+```
+version: '3.4'
+services:
+  bitcoin:
+    image: bitcoind:latest
+    # always restart after container died
+    restart: always
+    ports:
+      # forward container port 8333 to port 8333 on host
+      - 8333:8333 
+    volumes:
+      # mount the volume containing bitcoin.conf and the blockchain data 
+      # on the host to /bitcoin/.bitcoin in the container
+      - /your/home/directory/docker/volumes/bitcoin/bitcoind:/bitcoin/.bitcoin
+  lnd:
+    image: lnd:0.4-beta
+    # always restart after container died
+    restart: always
+    ports:
+      # forward container port 9735 to port 9735 on host
+      - 9735:9735
+      # forward container port 10009 to port 10009 on host
+      # Only necessary if your want to use lncli from the docker host.
+      # You will need to link /your/home/directory/docker/volumes/bitcoin/lnd to $HOME/.lnd
+      # and copy lncli binary from the lnd container using the 'docker copy' command
+      # This is useful, since you are able to unlock the wallet directly from the host
+      # without needing to log into your lnd container at every startup
+      - 10009:10009
+    volumes:
+      # mount the volume containing lnd.conf and lnd data 
+      # on the host to /root/.lnd in the container
+      - /your/home/directory/docker/volumes/bitcoin/lnd:/root/.lnd
+  # Your lightning enabled app goes here
+  lapp:
+    image: lapp:latest
+    restart: always
+    ports:
+      # forward container port 8000 to port 80 on host
+      - 80:8000
+    volumes:
+      # mount the volume containing lnd.conf and lnd data 
+      # on the host to /root/.lnd in the container
+      - /your/home/directory/docker/volumes/bitcoin/lnd:/root/.lnd
+    environment:
+      # set an environment variable to tell the container on which 
+      # host lnd runs on
+      LND_HOST: lnd
+
+``` 
+
+If we built all the images without error and we have tagged the images correctly, we should be able to
+startup the stack like this:
+
+```
+docker stack deploy -c lapp.yaml lapp
+```
+
+To stop the stack again use:
+
+```
+docker stack rm lapp
+```
+
+To list all services type:
+
+```
+docker stack list
+```
+
+To display the output of a certain service use:
+
+```
+docker stack logs -f lapp_bitcoin
+docker stack logs -f lapp_lnd
+docker stack logs -f lapp_lapp
+```
