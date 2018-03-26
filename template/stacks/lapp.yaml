@@ -12,6 +12,11 @@ services:
     restart: always
     ports:
       - 9735:9735
+      # Only necessary if your want to use lncli from the docker host.
+      # You will need to link /your/home/directory/docker/volumes/bitcoin/lnd to $HOME/.lnd
+      # and copy lncli binary from the lnd container using the 'docker copy' command
+      # This is useful, since you are able to unlock the wallet directly from the host
+      # without needing to log into your lnd container at every startup
       - 10009:10009
     volumes:
       - /your/home/directory/docker/volumes/bitcoin/lnd:/root/.lnd
