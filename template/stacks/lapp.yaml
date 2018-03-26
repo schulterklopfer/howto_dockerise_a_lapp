@@ -6,7 +6,7 @@ services:
     ports:
       - 8333:8333
     volumes:
-      - /your/home/directory/docker/volumes/bitcoin/bitcoin:/bitcoin/.bitcoin
+      - /your/home/directory/docker/volumes/bitcoin/bitcoind:/bitcoin/.bitcoin
   lnd:
     image: lnd:0.4-beta
     restart: always
