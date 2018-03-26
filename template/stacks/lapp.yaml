@@ -2,16 +2,23 @@ version: '3.4'
 services:
   bitcoin:
     image: bitcoind:latest
+    # always restart after container died
     restart: always
     ports:
+      # forward container port 8333 to port 8333 on host
       - 8333:8333
     volumes:
+      # mount the volume containing bitcoin.conf and the blockchain data
+      # on the host to /bitcoin/.bitcoin in the container
       - /your/home/directory/docker/volumes/bitcoin/bitcoind:/bitcoin/.bitcoin
   lnd:
     image: lnd:0.4-beta
+    # always restart after container died
     restart: always
     ports:
+      # forward container port 9735 to port 9735 on host
       - 9735:9735
+      # forward container port 10009 to port 10009 on host
       # Only necessary if your want to use lncli from the docker host.
       # You will need to link /your/home/directory/docker/volumes/bitcoin/lnd to $HOME/.lnd
       # and copy lncli binary from the lnd container using the 'docker copy' command
@@ -19,13 +26,21 @@ services:
       # without needing to log into your lnd container at every startup
       - 10009:10009
     volumes:
+      # mount the volume containing lnd.conf and lnd data
+      # on the host to /root/.lnd in the container
       - /your/home/directory/docker/volumes/bitcoin/lnd:/root/.lnd
+  # Your lightning enabled app goes here
   lapp:
     image: lapp:latest
     restart: always
     ports:
-      - 80:80
+      # forward container port 8000 to port 80 on host
+      - 80:8000
     volumes:
+      # mount the volume containing lnd.conf and lnd data
+      # on the host to /root/.lnd in the container
       - /your/home/directory/docker/volumes/bitcoin/lnd:/root/.lnd
     environment:
+      # set an environment variable to tell the container on which
+      # host lnd runs on
       LND_HOST: lnd
