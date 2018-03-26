@@ -28,7 +28,7 @@ RUN dep ensure
 RUN go install . ./cmd/...
 
 RUN rm -rf $GOPATH/src
-RUN apt-get remove -y golang-1.10 git
-RUN apt-get autoremove -y
+
+RUN apt-get purge -y golang-1.10 git && apt-get autoremove -y && apt-get clean && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
 
 CMD ["lnd"]
