@@ -216,9 +216,9 @@ docker stack list
 To display the output of a certain service use:
 
 ```bash
-docker stack logs -f lapp_bitcoin
-docker stack logs -f lapp_lnd
-docker stack logs -f lapp_lapp
+docker stack logs -t lapp_bitcoin
+docker stack logs -t lapp_lnd
+docker stack logs -t lapp_lapp
 ```
 
 ----
