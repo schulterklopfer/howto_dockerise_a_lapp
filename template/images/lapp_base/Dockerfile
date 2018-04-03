@@ -1,4 +1,4 @@
-FROM lnd:0.4-beta
+FROM lnd:latest
 
 RUN rm $GOPATH/bin/lnd
 WORKDIR /root/

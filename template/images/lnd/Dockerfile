@@ -14,12 +14,10 @@ EXPOSE 9735 8080 10009
 
 RUN git config --global user.email "robot@docker.io"
 RUN git config --global user.name "DockRob"
-RUN git clone https://github.com/lightningnetwork/lnd $GOPATH/src/github.com/lightningnetwork/lnd
+RUN git clone https://github.com/lightningnetwork/lnd $GOPATH/src/github.com/lightningnetwork/lnd-v0.4.1-beta
 RUN echo $GOPATH
-WORKDIR $GOPATH/src/github.com/lightningnetwork/lnd
-RUN git checkout v0.4-beta
-# cherry pick commit which introduced tlxextradomain config switch
-RUN git cherry-pick 237ed4fc6ec3f34a67a65e1e79cb43302b0cb634
+WORKDIR $GOPATH/src/github.com/lightningnetwork/lnd-v0.4.1-beta
+RUN git checkout v0.4.1-beta
 
 # Make lnd folder default.
 

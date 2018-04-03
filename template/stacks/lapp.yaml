@@ -12,7 +12,7 @@ services:
       # on the host to /bitcoin/.bitcoin in the container
       - /your/directory/docker/volumes/bitcoin/bitcoind:/bitcoin/.bitcoin
   lnd:
-    image: lnd:0.4-beta
+    image: lnd:latest
     # always restart after container died
     restart: always
     ports:
