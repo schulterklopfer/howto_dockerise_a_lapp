@@ -56,14 +56,14 @@ This will call `docker build` in the respective folder and tag the resulting ima
 
 # will always build a container with the latest release of bitcoind
 docker build bitcoind -t bitcoind:latest && \
-# will build lnd 0.4.1 beta and cherry pick some commits to support communication over docker containers
-docker build lnd -t lnd:0.4.1-beta -t lnd:latest && \
+# will build lnd 0.4.2 beta and cherry pick some commits to support communication over docker containers
+docker build lnd -t lnd:0.4.2-beta -t lnd:latest && \
 # will build a base image containing the lncli command
 docker build lapp_base -t lapp_base:latest 
 ```
 
 * bitcoind will have the tag 'bitcoind:latest'
-* lnd will have the tag 'lnd:0.4.1-beta' and 'lnd:latest'
+* lnd will have the tag 'lnd:0.4.2-beta' and 'lnd:latest'
 * lapp_base will have the tag 'lapp_base:latest'
 
 From now on you can use those images with docker to run containers based on those images.
@@ -72,7 +72,7 @@ If you run `docker image list` you will find your newly built images in the resu
 REPOSITORY    TAG         IMAGE ID        CREATED            SIZE
 bitcoind      latest      7a460845b7c9    17 seconds ago    141MB
 lapp_base     latest      ac4c49f95459    17 seconds ago    1.07GB
-lnd           0.4.1-beta  7c12bc05cee0    17 seconds ago    1.07GB
+lnd           0.4.2-beta  7c12bc05cee0    17 seconds ago    1.07GB
 lnd           latest      7c12bc05cee0    17 seconds ago    1.07GB
 
 ```

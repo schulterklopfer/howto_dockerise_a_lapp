@@ -14,10 +14,10 @@ EXPOSE 9735 8080 10009
 
 RUN git config --global user.email "robot@docker.io"
 RUN git config --global user.name "DockRob"
-RUN git clone https://github.com/lightningnetwork/lnd $GOPATH/src/github.com/lightningnetwork/lnd-v0.4.1-beta
+RUN git clone https://github.com/lightningnetwork/lnd $GOPATH/src/github.com/lightningnetwork/lnd
 RUN echo $GOPATH
-WORKDIR $GOPATH/src/github.com/lightningnetwork/lnd-v0.4.1-beta
-RUN git checkout v0.4.1-beta
+WORKDIR $GOPATH/src/github.com/lightningnetwork/lnd
+RUN git checkout v0.4.2-beta
 
 # Make lnd folder default.
 
