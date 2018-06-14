@@ -229,7 +229,7 @@ Do you like this small guide?
 Then [send me an email](mailto:howto_lapp@skp.rocks) or maybe even some love to
 `3DEs5ZVP38z1nxMhveiPhHkbeuhnfhiJ6R`
 
-Also checkout my [sonification of the bitcoin blockchain](http://radio.skp.rocks/blockchain/) (Currently down :( )
+Also checkout my [sonification of the bitcoin blockchain](http://bitcoinradio.skp.rocks/)
 
 Thanks for reading. :-D
 
