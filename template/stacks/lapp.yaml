@@ -1,4 +1,4 @@
-version: '3.4'
+version: '3.3'
 services:
   bitcoin:
     image: bitcoind:latest
@@ -12,6 +12,8 @@ services:
       # on the host to /bitcoin/.bitcoin in the container
       - /your/directory/docker/volumes/bitcoin/bitcoind:/bitcoin/.bitcoin
   lnd:
+    depends_on:
+      - bitcoin
     image: lnd:latest
     # always restart after container died
     restart: always
@@ -31,6 +33,8 @@ services:
       - /your/directory/docker/volumes/bitcoin/lnd:/root/.lnd
   # Your lightning enabled app goes here
   lapp:
+    depends_on:
+      - lnd
     image: lapp:latest
     restart: always
     ports:
