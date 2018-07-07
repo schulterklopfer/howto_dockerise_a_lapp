@@ -1,0 +1,20 @@
+User debian-tor
+
+Log warn stdout
+
+DataDirectory /var/lib/tor
+PidFile /var/run/tor/tor.pid
+
+ControlSocket /var/run/tor/control GroupWritable RelaxDirModeCheck
+ControlSocketsGroupWritable 1
+SocksPort unix:/var/run/tor/socks WorldWritable
+SocksPort 9050
+ControlPort 9051
+
+CookieAuthentication 1
+CookieAuthFileGroupReadable 1
+CookieAuthFile /var/run/tor/control.authcookie
+
+Log notice file /var/log/tor/log
+
+

@@ -48,7 +48,18 @@ EXPOSE 8332 8333 18332 18333
 
 WORKDIR /bitcoin
 
+
+# TOR
+RUN apt-get update && apt-get install -y tor
+
+RUN mkdir -p /var/run/tor
+RUN chown -R debian-tor:debian-tor /var/run/tor
+
+RUN usermod -a -G debian-tor bitcoin
+
 COPY docker-entrypoint.sh /usr/local/bin/
+COPY torrc /etc/tor/torrc
+
 ENTRYPOINT ["docker-entrypoint.sh"]
 
 CMD ["btc_oneshot"]
