@@ -1,9 +1,8 @@
 User debian-tor
 
-Log warn stdout
-
 DataDirectory /var/lib/tor
 PidFile /var/run/tor/tor.pid
+RunAsDaemon 1
 
 ControlSocket /var/run/tor/control GroupWritable RelaxDirModeCheck
 ControlSocketsGroupWritable 1
