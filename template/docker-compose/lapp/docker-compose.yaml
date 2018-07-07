@@ -1,0 +1,56 @@
+version: '2.0'
+services:
+  bitcoin:
+    image: bitcoind:latest
+    # always restart after container died
+    restart: always
+    ports:
+      # forward container port 8333 to port 8333 on host
+      - 8333:8333
+    volumes:
+      # mount the volume containing bitcoin.conf and the blockchain data
+      # on the host to /bitcoin/.bitcoin in the container
+      - /your/directory/docker/volumes/bitcoin/bitcoind:/bitcoin/.bitcoin
+  lnd:
+    depends_on:
+      - bitcoin
+    image: lnd:latest
+    # always restart after container died
+    restart: always
+    ports:
+      # forward container port 9735 to port 9735 on host
+      - 9735:9735
+      # forward container port 10009 to port 10009 on host
+      # Only necessary if your want to use lncli from the docker host.
+      # You will need to link /your/home/directory/docker/volumes/bitcoin/lnd to $HOME/.lnd
+      # and copy lncli binary from the lnd container using the 'docker copy' command
+      # This is useful, since you are able to unlock the wallet directly from the host
+      # without needing to log into your lnd container at every startup
+      - 10009:10009
+    volumes:
+      # mount the volume containing lnd.conf and lnd data
+      # on the host to /root/.lnd in the container
+      - /your/directory/docker/volumes/bitcoin/lnd:/root/.lnd
+    # link bitcoin container into this container so lnd can connect to the services running inside the bitcoin container
+    links:
+      - bitcoin
+  # Your lightning enabled app goes here
+  lapp:
+    depends_on:
+      - lnd
+    image: lapp:latest
+    restart: always
+    ports:
+      # forward container port 8000 to port 80 on host
+      - 80:8000
+    volumes:
+      # mount the volume containing lnd.conf and lnd data
+      # on the host to /root/.lnd in the container
+      - /your/directory/docker/volumes/bitcoin/lnd:/root/.lnd
+    environment:
+      # set an environment variable to tell the container on which
+      # host lnd runs on
+      LND_HOST: lnd
+    # link lnd container into this container so lapp can connect to the services running inside the lnd container
+    links:
+      - lnd

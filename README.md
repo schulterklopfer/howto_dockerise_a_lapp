@@ -1,10 +1,12 @@
 # How to dockerise a lightning app on ubuntu 16.04
 
-## Intended setup
+## Alternative 1: Using docker swarm and stacks
 
-![LAPP docker stack](https://github.com/schulterklopfer/howto_dockerise_a_lapp/raw/master/lapp_stack.png "LAPP docker stack")
+### Intended setup
 
-## Prerequisits
+![LAPP docker stack](https://github.com/schulterklopfer/howto_dockerise_a_lapp/raw/master/graphs/stack.png "LAPP docker stack")
+
+### Prerequisits
 
 * free disk space of at least 200G for docker images and blockchain data
 * user with sudo privileges
@@ -12,7 +14,7 @@
 * git
 * coffee :)
 
-## 1. Install docker
+### 1. Install docker
 To install docker on your machine, please follow [this guide](https://www.digitalocean.com/community/tutorials/how-to-install-and-use-docker-on-ubuntu-16-04). Make sure you don't forget
 to add your user to the docker group by using this command:
  
@@ -20,7 +22,7 @@ to add your user to the docker group by using this command:
 sudo usermod -aG docker ${USER}
 ``` 
 
-## 2. Create a docker swarm
+### 2. Create a docker swarm (you might want to skip this, when using alternative 2 described later)
 This guide relies on docker stacks. To use docker stacks we need to put your docker daemon
 into swarm mode. Swarm mode is very useful to distribute this setup across several physical hosts.
 The following command will initialise your docker daemon for swarm mode:
@@ -31,7 +33,7 @@ docker swarm init
 
 find out more about this command [here](https://docs.docker.com/engine/reference/commandline/swarm_init/).
 
-## 3. Create your docker images
+### 3. Create your docker images
 Your lightning app stack will contain three docker services
 
 1) bitcoind
@@ -131,10 +133,10 @@ for your stack deployment. This topic will be covered later.
 Now we have everything we need to configure and run our bitcoin stack containing your
 lightning app.
 
-## 4. Run your lightning app stack
+### 4. Run your lightning app stack (you might want to skip this, when using alternative 2 described later)
 
 To tell docker what containers we want to run from which image, we will need to write a configuration
-file containing all the information to run a container. This information includes for example services
+file containing all the information to run the containers. This information includes for example services
 we want to start, volumes to mount into the docker container, ports to make accessible to the host and such.
 
 Typically those files are in `yaml` format.
@@ -223,14 +225,163 @@ docker stack logs -t lapp_lnd
 docker stack logs -t lapp_lapp
 ```
 
+## Alternative 2: Using docker-compose
+
+### Intended setup
+
+![LAPP docker stack](https://github.com/schulterklopfer/howto_dockerise_a_lapp/raw/master/graphs/compose.png "LAPP docker stack")
+
+### Prerequisits
+
+In addition to the things you need specified in the first section of this HOWTO you will need the following 
+* python 
+* docker-compose (`pip install docker-compose`)
+
+### Why?
+
+In a single server setup, where no vertical scaling is needed its sometimes easier to run the docker containers
+outside of the swarm. For example if your server has more than one network interface and you want to bind a port
+exposed by a docker container to a specific interface, you will need to run the container outside swarm mode. Docker
+swarm distributes containers across several machines, so binding to a specific interface on a specific machine
+makes no sense and does not work.
+
+An example for this would be running lnd, bitcoind and some lapp on one interface and c-lightning, bitcoind and 
+[btcpayserver](https://github.com/btcpayserver) on another one. Doing it this way will allow you to use the default 
+ports of the lightning network nodes on each interface without having to worry about port collisions.
+
+### Whats different?
+
+The main difference between running the containers directly vs. running them in swarm mode is, that you will not
+have an internal swarm networks with name resolving. This means we will need to link the containers together, so
+they are able to resolve each other and connect to the services the other containers are providing. The rest will
+stay pretty much the same, except starting the whole thing up.
+
+### Ok. Now what?
+
+Follow the steps 1 to 3 of the previous section. If you only want to run your containers with docker-compose, then
+just skip step 2 of the previous section.
+
+### 4. Run your lightning app containers (using docker-compose)
+
+To tell docker what containers we want to run from which images, we will need to write a configuration
+file containing all the information to create the containers. This information includes volumes to mount
+into the docker container, ports to make accessible to the host and such.
+
+Typically those files are in `yaml` format.
+
+For our case, we need to run three containers. 
+* One using the bitcoind:latest image
+* One using the lnd:latest image
+* One using your application, in this case lapp:latest
+
+The configuration file for the docker-compose command is quite similar to 
+the one for running everything inside a stack, except the `links` sections and
+the `version` of the language specification we use for the docker-compose file.
+
+```yaml
+version: '2.0'
+services:
+  bitcoin:
+    image: bitcoind:latest
+    # always restart after container died
+    restart: always
+    ports:
+      # forward container port 8333 to port 8333 on host
+      - 8333:8333
+    volumes:
+      # mount the volume containing bitcoin.conf and the blockchain data
+      # on the host to /bitcoin/.bitcoin in the container
+      - /your/directory/docker/volumes/bitcoin/bitcoind:/bitcoin/.bitcoin
+  lnd:
+    depends_on:
+      - bitcoin
+    image: lnd:latest
+    # always restart after container died
+    restart: always
+    ports:
+      # forward container port 9735 to port 9735 on host
+      - 9735:9735
+      # forward container port 10009 to port 10009 on host
+      # Only necessary if your want to use lncli from the docker host.
+      # You will need to link /your/home/directory/docker/volumes/bitcoin/lnd to $HOME/.lnd
+      # and copy lncli binary from the lnd container using the 'docker copy' command
+      # This is useful, since you are able to unlock the wallet directly from the host
+      # without needing to log into your lnd container at every startup
+      - 10009:10009
+    volumes:
+      # mount the volume containing lnd.conf and lnd data
+      # on the host to /root/.lnd in the container
+      - /your/directory/docker/volumes/bitcoin/lnd:/root/.lnd
+    # link bitcoin container into this container so lnd can connect to the services running inside the bitcoin container
+    links:
+      - bitcoin
+  # Your lightning enabled app goes here
+  lapp:
+    depends_on:
+      - lnd
+    image: lapp:latest
+    restart: always
+    ports:
+      # forward container port 8000 to port 80 on host
+      - 80:8000
+    volumes:
+      # mount the volume containing lnd.conf and lnd data
+      # on the host to /root/.lnd in the container
+      - /your/directory/docker/volumes/bitcoin/lnd:/root/.lnd
+    environment:
+      # set an environment variable to tell the container on which
+      # host lnd runs on
+      LND_HOST: lnd
+    # link lnd container into this container so lapp can connect to the services running inside the lnd container
+    links:
+      - lnd
+``` 
+
+startup all the needed containers by using the following command.
+
+```bash
+cd template/docker-compose/lapp/ 
+docker-compose up
+```
+
+To stop the containers again use:
+
+```bash
+docker-compose down
+```
+
+To list all services type:
+
+```bash
+docker-compose ps
+```
+which will give you an output something like that:
+
+```
+      Name                     Command               State                              Ports                            
+-------------------------------------------------------------------------------------------------------------------------
+bitcoin_bitcoin_1   docker-entrypoint.sh btc_o ...   Up      18332/tcp, 18333/tcp, 8332/tcp, 8333->8333/tcp
+bitcoin_lnd_1       lnd                              Up      127.0.0.1:10009->10009/tcp, 9735->9735/tcp    
+bitcoin_lapp_1      /bin/sh -c lncli --rpcserv ...   Up      10009/tcp, 80->8000/tcp, 9735/tcp           
+```
+
+
+To display the output of a certain service use:
+
+```bash
+docker-compose logs
+```
+
+
 ----
 
-Do you like this small guide?
-Then [send me an email](mailto:howto_lapp@skp.rocks) or maybe even some love to
-`********************`
+***********`
+=======
+Do you like this small guide or found some errors?
+Then [send me an email](mailto:howto_lapp@skp.rocks) 
 
 Also checkout my [sonification of the bitcoin blockchain](http://bitcoinradio.skp.rocks/)
 
 Thanks for reading. :-D
 
-*CapitanRetardo*
+*SKP*
