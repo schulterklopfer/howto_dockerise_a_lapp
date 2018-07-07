@@ -375,8 +375,6 @@ docker-compose logs
 
 ----
 
-***********`
-=======
 Do you like this small guide or found some errors?
 Then [send me an email](mailto:howto_lapp@skp.rocks) 
 
